@@ -16,6 +16,37 @@ export default class ApiService extends Service {
 			settings: {
 				port: process.env.PORT || 3000,
 
+				io: {
+					namespaces: {
+						'/': {
+							authorization: true,
+							middlewares: [],
+							packetMiddlewares: [],
+							events: {
+								'call': {
+									mappingPolicy: 'all',
+									aliases: {
+									  'add': 'math.add'
+									},
+									whitelist: [
+									  'math.*'
+									],
+									callOptions: {},
+									onBeforeCall: async function(ctx:any, socket:any, args:any){
+										console.log("beforeCall!!!!!");
+										ctx.meta.socketid = socket.id
+										ctx.meta.socket = socket;
+									},
+									onAfterCall:async function(ctx:any, socket:any, data:any){
+										console.log("afterCall!!!!!");
+										socket.emit('afterCall', data)
+									}
+								},
+							}
+						}
+					}
+				},
+
 				routes: [{
 					path: "/api",
 					whitelist: [
@@ -101,6 +132,24 @@ export default class ApiService extends Service {
 			},
 
 			methods: {
+
+				async socketAuthorize(socket:any, eventHandler:any){
+					// let accessToken = socket.handshake.query.token
+					// if (accessToken) {
+					// 	try{
+					// 	let user = await this.broker.call("user.verifyToken", {accessToken})
+					// 	return {id: user.id, email: user.email, token: accessToken}  // valid credential, return the user
+					// 	}catch(err){
+					// 	throw new ApiGateway.Errors.UnAuthorizedError(ApiGateway.Errors.ERR_INVALID_TOKEN, {
+					// 		error: "Invalid Token",
+					// 	});
+					// 	}
+					// } else {
+					// 	// anonymous user
+					// 	return
+					// }
+					this.logger.info("Socket Verify!");
+				}
 
 				/**
 				 * Authenticate the request. It checks the `Authorization` token value in the request header.

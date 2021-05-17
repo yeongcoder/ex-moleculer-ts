@@ -14,8 +14,8 @@ export default class GreeterService extends Service {
 				 *
 				 */
 				add: {
-					async handler(ctx:Context<any>): Promise<number> {
-						this.logger.info(ctx.params);
+					async handler(ctx:Context<any,any>): Promise<number> {
+						ctx.meta.socket.emit('hello', '<< welcome >>');
 						return this.ActionAdd(ctx.params.a, ctx.params.b);
 					},
 				},
