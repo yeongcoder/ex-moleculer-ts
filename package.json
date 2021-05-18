@@ -10,6 +10,8 @@
     "ci": "jest --watch",
     "test": "jest --coverage",
     "gateway": "ts-node ./node_modules/moleculer/bin/moleculer-runner.js --hot --repl --config moleculer.config.ts services/gateway/**/*.service.ts",
+    "api": "ts-node ./node_modules/moleculer/bin/moleculer-runner.js --hot --repl --config moleculer.config.ts services/gateway/api.service.ts",
+    "socket": "ts-node ./node_modules/moleculer/bin/moleculer-runner.js --hot --repl --config moleculer.config.ts services/gateway/api.service.ts",
     "greeter": "ts-node ./node_modules/moleculer/bin/moleculer-runner.js --hot --repl --config moleculer.config.ts services/greeter/**/*.service.ts",
     "math": "ts-node ./node_modules/moleculer/bin/moleculer-runner.js --hot --repl --config moleculer.config.ts services/math/**/*.service.ts",
     "product": "ts-node ./node_modules/moleculer/bin/moleculer-runner.js --hot --repl --config moleculer.config.ts services/product/**/*.service.ts"
