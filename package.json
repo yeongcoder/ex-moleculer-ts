@@ -8,7 +8,10 @@
     "start": "moleculer-runner --config dist/moleculer.config.js",
     "cli": "moleculer connect TCP",
     "ci": "jest --watch",
-    "test": "jest --coverage"
+    "test": "jest --coverage",
+    "greeter": "ts-node ./services/greeter/index.ts",
+    "math": "ts-node ./services/math/index.ts",
+    "product": "ts-node ./services/product/index.ts"
   },
   "keywords": [
     "microservices",

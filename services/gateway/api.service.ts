@@ -1,8 +1,5 @@
-import {IncomingMessage} from "http";
 import {Service, ServiceBroker, Context} from "moleculer";
-import ApiGateway from "moleculer-web";
-
-const SocketIOService = require("moleculer-io");
+import ApiGatewayService from "moleculer-web";
 
 export default class ApiService extends Service {
 
@@ -10,42 +7,11 @@ export default class ApiService extends Service {
 		super(broker);
 		// @ts-ignore
 		this.parseServiceSchema({
-			name: "api",
-			mixins: [ApiGateway, SocketIOService],
+			name: "ApiGateway",
+			mixins: [ApiGatewayService],
 			// More info about settings: https://moleculer.services/docs/0.14/moleculer-web.html
 			settings: {
 				port: process.env.PORT || 3000,
-
-				io: {
-					namespaces: {
-						'/': {
-							authorization: true,
-							middlewares: [],
-							packetMiddlewares: [],
-							events: {
-								'call': {
-									mappingPolicy: 'all',
-									aliases: {
-									  'add': 'math.add'
-									},
-									whitelist: [
-									  'math.*'
-									],
-									callOptions: {},
-									onBeforeCall: async function(ctx:any, socket:any, args:any){
-										console.log("beforeCall!!!!!");
-										ctx.meta.socketid = socket.id
-										ctx.meta.socket = socket;
-									},
-									onAfterCall:async function(ctx:any, socket:any, data:any){
-										console.log("afterCall!!!!!");
-										socket.emit('afterCall', data)
-									}
-								},
-							}
-						}
-					}
-				},
 
 				routes: [{
 					path: "/api",

@@ -1,7 +1,7 @@
 "use strict";
 import {Context, Service, ServiceBroker, ServiceSchema} from "moleculer";
 
-import DbConnection from "../mixins/db.mixin";
+import DbConnection from "../../mixins/db.mixin";
 
 export default class ProductsService extends Service{
 
