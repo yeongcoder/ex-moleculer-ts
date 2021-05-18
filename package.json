@@ -9,9 +9,10 @@
     "cli": "moleculer connect TCP",
     "ci": "jest --watch",
     "test": "jest --coverage",
-    "greeter": "ts-node ./services/greeter/index.ts",
-    "math": "ts-node ./services/math/index.ts",
-    "product": "ts-node ./services/product/index.ts"
+    "gateway": "ts-node ./node_modules/moleculer/bin/moleculer-runner.js --hot --repl --config moleculer.config.ts services/gateway/**/*.service.ts",
+    "greeter": "ts-node ./node_modules/moleculer/bin/moleculer-runner.js --hot --repl --config moleculer.config.ts services/greeter/**/*.service.ts",
+    "math": "ts-node ./node_modules/moleculer/bin/moleculer-runner.js --hot --repl --config moleculer.config.ts services/math/**/*.service.ts",
+    "product": "ts-node ./node_modules/moleculer/bin/moleculer-runner.js --hot --repl --config moleculer.config.ts services/product/**/*.service.ts"
   },
   "keywords": [
     "microservices",
