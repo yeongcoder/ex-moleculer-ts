@@ -1,5 +1,10 @@
 import {Service, ServiceBroker, Context} from "moleculer";
+import { createAdapter as RedisAdapter } from 'socket.io-redis';
+
 const SocketIOService = require("moleculer-io");
+const AmqpAdapter = require("socket.io-amqp");
+
+const PortNum = Math.floor(Math.random() * (4000 - 3000) + 3000);
 
 export default class SocketService extends Service {
 
@@ -7,13 +12,16 @@ export default class SocketService extends Service {
 		super(broker);
 		// @ts-ignore
 		this.parseServiceSchema({
-			name: "SocketGateway",
+			name: "socket",
 			mixins: [SocketIOService],
-			// More info about settings: https://moleculer.services/docs/0.14/moleculer-web.html
+			// More info about settings: https://github.com/tiaod/moleculer-io
 			settings: {
-				port: process.env.PORT || 3001,
-
+				port: PortNum,//process.env.PORT || 3001,
 				io: {
+					options: {
+						//adapter: RedisAdapter("redis://localhost:6379")
+						adapter: AmqpAdapter("amqp://root:\@uc898911@115.85.180.58:5672")
+				  	},
 					namespaces: {
 						'/': {
 							authorization: true,
@@ -23,37 +31,40 @@ export default class SocketService extends Service {
 								'call': {
 									mappingPolicy: 'all',
 									aliases: {
-									  'add': 'math.add'
+										'join': 'message.join',
+										'leave': 'message.leave',
+										'chat': 'message.chat',
 									},
 									whitelist: [
-									  'math.*'
+									  '**'
 									],
 									callOptions: {},
 									onBeforeCall: async function(ctx:any, socket:any, args:any){
-										console.log("beforeCall!!!!!");
-										ctx.meta.socketid = socket.id
 										ctx.meta.socket = socket;
 									},
 									onAfterCall:async function(ctx:any, socket:any, data:any){
-										console.log("afterCall!!!!!");
-										socket.emit('afterCall', data)
+
 									}
 								},
+								'call02': {
+									mappingPolicy: 'all',
+									aliases: {
+										'hello': 'greeter.hello'
+									},
+									whitelist: [
+									  '**'
+									],
+								}
 							}
 						}
 					}
 				},
-				// Do not log client side errors (does not log an error response when the error.code is 400<=X<500)
-				log4XXResponses: false,
-				// Logging the request parameters. Set to any log level to enable it. E.g. "info"
-				logRequestParams: null,
-				// Logging the response data. Set to any log level to enable it. E.g. "info"
-				logResponseData: null,
 			},
 
 			methods: {
 
 				async socketAuthorize(socket:any, eventHandler:any){
+					this.logger.info("Socket Authorize!");
 					// let accessToken = socket.handshake.query.token
 					// if (accessToken) {
 					// 	try{
@@ -68,10 +79,19 @@ export default class SocketService extends Service {
 					// 	// anonymous user
 					// 	return
 					// }
-					this.logger.info("Socket Authorize!");
+					// throw new ApiGatewayService.Errors.UnAuthorizedError(ApiGatewayService.Errors.ERR_INVALID_TOKEN, {
+					// 	error: "Invalid Token",
+					// });
+					// let res = await this.broker.call("greeter.hello");
+					// this.logger.info('greeter res:', res);\
+					//await this.broker.call("greeter.hello");
+					
 				}
 			},
 
+			created(){
+				this.logger.info("Listen Port:", PortNum);
+			}
 		});
 	}
 }
