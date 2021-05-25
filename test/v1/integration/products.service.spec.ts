@@ -1,7 +1,7 @@
 "use strict";
 
 import { ServiceBroker } from "moleculer";
-import TestService from "../../services/products.service";
+import TestService from "../../v1/services/products.service";
 
 describe("Test 'products' service", () => {
 

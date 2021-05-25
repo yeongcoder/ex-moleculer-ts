@@ -8,6 +8,7 @@ export default class ApiService extends Service {
 		// @ts-ignore
 		this.parseServiceSchema({
 			name: "ApiGateway",
+			version: 1,
 			mixins: [ApiGatewayService],
 			// More info about settings: https://moleculer.services/docs/0.14/moleculer-web.html
 			settings: {
@@ -186,6 +187,9 @@ export default class ApiService extends Service {
 				 */
 			},
 
+			created(){
+				this.logger.info("PORT:", this.settings.port);
+			}
 		});
 	}
 }

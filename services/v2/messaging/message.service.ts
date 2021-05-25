@@ -1,26 +1,29 @@
+"use strict";
+
 import {Service, ServiceBroker, Context} from "moleculer";
 import { createAdapter as RedisAdapter } from 'socket.io-redis';
+import { started } from "../../../moleculer.config";
 
 const SocketIOService = require("moleculer-io");
 const AmqpAdapter = require("socket.io-amqp");
 
 const PortNum = Math.floor(Math.random() * (4000 - 3000) + 3000);
 
-export default class SocketService extends Service {
+export default class MessageService extends Service {
 
-	public constructor(broker: ServiceBroker) {
+	public constructor(public broker: ServiceBroker) {
 		super(broker);
-		// @ts-ignore
 		this.parseServiceSchema({
-			name: "socket",
+			name: "message",
+			version: 2,
 			mixins: [SocketIOService],
-			// More info about settings: https://github.com/tiaod/moleculer-io
+
 			settings: {
-				port: PortNum,//process.env.PORT || 3001,
+				port: process.env.PORT || 3001,
 				io: {
 					options: {
 						//adapter: RedisAdapter("redis://localhost:6379")
-						adapter: AmqpAdapter("amqp://root:\@uc898911@115.85.180.58:5672")
+						//adapter: AmqpAdapter("amqp://root:\@uc898911@115.85.180.58:5672")
 				  	},
 					namespaces: {
 						'/': {
@@ -59,6 +62,56 @@ export default class SocketService extends Service {
 						}
 					}
 				},
+			},
+
+			actions:{
+				chat: {
+					params: {
+						test: "string",
+						room: "string"
+					},
+					async handler(ctx:Context<{text: string, room: string},any>): Promise<number> {
+
+						console.log("ctx.meta.$rooms: ", ctx.meta.$rooms);
+						console.log("ctx.meta.$user: ", ctx.meta.$user);
+
+						this.logger.info(`"${ctx.meta.socket.id}" chat : ${ctx.params.text}`);
+
+						ctx.meta.socket.to(ctx.params.room).emit('chat',`${ctx.meta.socket.id}: ${ctx.params.text}`);
+
+						return 0;
+					},
+				},
+				join: {
+					params: {
+						room: "string"
+					},
+					async handler(ctx:Context<{ room: string },any>): Promise<number> {
+
+						this.logger.info(`"${ctx.meta.socket.id}" join to ${ctx.params.room}`);
+
+						ctx.meta.socket.to(ctx.params.room).emit('noti',`"${ctx.meta.socket.id}" join`);
+
+						ctx.meta.$join = ctx.params.room;
+
+						return 0;
+					},
+				},
+				leave: {
+					params: {
+						room: "string"
+					},
+					async handler(ctx:Context<{ room: string },any>): Promise<number> {
+
+						this.logger.info(`"${ctx.meta.socket.id}" leave from ${ctx.params.room}`);
+
+						ctx.meta.socket.to(ctx.params.room).emit('noti',`"${ctx.meta.socket.id}" leave`);
+
+						ctx.meta.$leave = ctx.params.room;
+
+						return 0;
+					},
+				}
 			},
 
 			methods: {
